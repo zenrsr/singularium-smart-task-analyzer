@@ -6,6 +6,8 @@
 // ==================== GLOBAL STATE ====================
 let currentTasks = [];
 let currentResults = null;
+let currentPage = 1;
+const TASKS_PER_PAGE = 5;
 const API_BASE = 'http://127.0.0.1:8000/api/tasks';
 
 // ==================== DOM ELEMENTS ====================
@@ -74,6 +76,12 @@ const elements = {
     errorMessage: document.getElementById('error-message'),
     successToast: document.getElementById('success-toast'),
     successMessage: document.getElementById('success-message'),
+
+    // Pagination
+    paginationControls: document.getElementById('pagination-controls'),
+    prevPageBtn: document.getElementById('prev-page-btn'),
+    nextPageBtn: document.getElementById('next-page-btn'),
+    pageInfo: document.getElementById('page-info'),
 };
 
 // ==================== INITIALIZATION ====================
@@ -110,6 +118,10 @@ function setupEventListeners() {
     // Visualizations
     elements.showMatrixBtn?.addEventListener('click', showEisenhowerMatrix);
     elements.showGraphBtn?.addEventListener('click', showDependencyGraph);
+
+    // Pagination
+    elements.prevPageBtn?.addEventListener('click', () => changePage(-1));
+    elements.nextPageBtn?.addEventListener('click', () => changePage(1));
 
     // Modal Close
     document.querySelectorAll('.modal-close').forEach(btn => {
@@ -358,11 +370,12 @@ function displayResults(data) {
 
     const tasks = data.tasks;
     elements.tasksTotal.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
+    currentPage = 1;
 
     // Display top 3 suggestions
     displaySuggestions(tasks.slice(0, 3));
 
-    // Display all tasks
+    // Display all tasks with pagination
     displayAllTasks(tasks);
 }
 
@@ -377,10 +390,10 @@ function displaySuggestions(topTasks) {
             <div class="suggestion-rank">#${index + 1}</div>
             <h3 class="suggestion-title">${escapeHtml(task.title)}</h3>
             <div class="task-details">
-                <span class="task-detail">📅 ${formatDate(task.due_date)}</span>
-                <span class="task-detail">⏱️ ${task.estimated_hours}h</span>
-                <span class="task-detail">⭐ ${task.importance}/10</span>
-                <span class="task-detail">📊 Score: ${task.score}</span>
+                <span>Due: ${formatDate(task.due_date)}</span>
+                <span>${task.estimated_hours}h</span>
+                <span>Importance: ${task.importance}/10</span>
+                <span>Score: ${task.score}</span>
             </div>
             <p class="suggestion-reason">${escapeHtml(task.explanation)}</p>
         </div>
@@ -389,39 +402,75 @@ function displaySuggestions(topTasks) {
 
 function displayAllTasks(tasks) {
     if (tasks.length === 0) {
-        elements.allTasksList.innerHTML = '<p style="color: var(--text-muted);">No tasks to display</p>';
+        elements.allTasksList.innerHTML = '<p style="color: var(--text-secondary); padding: var(--space-m);">No tasks to display</p>';
+        elements.paginationControls.style.display = 'none';
         return;
     }
 
-    elements.allTasksList.innerHTML = tasks.map((task, index) => {
+    const totalPages = Math.ceil(tasks.length / TASKS_PER_PAGE);
+    const start = (currentPage - 1) * TASKS_PER_PAGE;
+    const end = start + TASKS_PER_PAGE;
+    const pageTasks = tasks.slice(start, end);
+
+    elements.allTasksList.innerHTML = pageTasks.map((task) => {
         const priorityClass = task.priority_level.toLowerCase();
 
         return `
-            <div class="task-card priority-${priorityClass}">
-                <div class="task-card-header">
-                    <div>
+            <div class="task-card">
+                <div class="task-info">
+                    <div class="task-title-row">
                         <h3 class="task-title">${escapeHtml(task.title)}</h3>
-                        <span class="task-badge ${priorityClass}">${task.priority_level}</span>
+                        <span class="priority-badge ${priorityClass}">${task.priority_level}</span>
                     </div>
-                    <div class="task-score">${task.score}</div>
-                </div>
-                
-                <div class="task-details">
-                    <span class="task-detail">📅 Due: ${formatDate(task.due_date)}</span>
-                    <span class="task-detail">⏱️ ${task.estimated_hours} hour${task.estimated_hours !== 1 ? 's' : ''}</span>
-                    <span class="task-detail">⭐ Importance: ${task.importance}/10</span>
-                    ${task.dependencies && task.dependencies.length > 0
-                ? `<span class="task-detail">🔗 Depends on: ${task.dependencies.join(', ')}</span>`
+                    <div class="task-meta">
+                        <span>Due: ${formatDate(task.due_date)}</span>
+                        <span>${task.estimated_hours}h</span>
+                        <span>Importance: ${task.importance}/10</span>
+                        ${task.dependencies && task.dependencies.length > 0
+                ? `<span>Blocks: ${task.dependencies.length}</span>`
                 : ''}
+                    </div>
                 </div>
-                
-                <div class="task-explanation">
-                    💡 ${escapeHtml(task.explanation)}
+                <div class="task-score-display">
+                    <div class="score-value">${task.score}</div>
+                    <div class="score-label">Score</div>
                 </div>
             </div>
         `;
     }).join('');
+
+    // Update pagination
+    updatePagination(totalPages);
 }
+
+// ==================== PAGINATION ====================
+function updatePagination(totalPages) {
+    if (totalPages <= 1) {
+        elements.paginationControls.style.display = 'none';
+        return;
+    }
+
+    elements.paginationControls.style.display = 'flex';
+    elements.pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    elements.prevPageBtn.disabled = currentPage === 1;
+    elements.nextPageBtn.disabled = currentPage === totalPages;
+}
+
+function changePage(delta) {
+    if (!currentResults || !currentResults.tasks) return;
+
+    const totalPages = Math.ceil(currentResults.tasks.length / TASKS_PER_PAGE);
+    const newPage = currentPage + delta;
+
+    if (newPage < 1 || newPage > totalPages) return;
+
+    currentPage = newPage;
+    displayAllTasks(currentResults.tasks);
+
+    // Scroll to top of tasks list
+    elements.allTasksList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 
 // ==================== EISENHOWER MATRIX ====================
 function showEisenhowerMatrix() {
@@ -456,20 +505,20 @@ function showEisenhowerMatrix() {
     });
 
     elements.matrixGrid.innerHTML = `
-        <div class="matrix-quadrant" style="border-color: var(--priority-high);">
-            <h3>🔴 Do First - Urgent & Important</h3>
+        <div class="matrix-quadrant q1">
+            <h3>Do First - Urgent & Important</h3>
             ${renderMatrixTasks(quadrants.urgent_important)}
         </div>
-        <div class="matrix-quadrant" style="border-color: var(--primary);">
-            <h3>🔵 Schedule - Not Urgent & Important</h3>
+        <div class="matrix-quadrant q2">
+            <h3>Schedule - Not Urgent & Important</h3>
             ${renderMatrixTasks(quadrants.notUrgent_important)}
         </div>
-        <div class="matrix-quadrant" style="border-color: var(--priority-medium);">
-            <h3>🟡 Delegate - Urgent & Not Important</h3>
+        <div class="matrix-quadrant q3">
+            <h3>Delegate - Urgent & Not Important</h3>
             ${renderMatrixTasks(quadrants.urgent_notImportant)}
         </div>
-        <div class="matrix-quadrant" style="border-color: var(--text-muted);">
-            <h3>⚪ Eliminate - Not Urgent & Not Important</h3>
+        <div class="matrix-quadrant q4">
+            <h3>Eliminate - Not Urgent & Not Important</h3>
             ${renderMatrixTasks(quadrants.notUrgent_notImportant)}
         </div>
     `;
@@ -552,7 +601,11 @@ async function checkCircularDependencies(tasks) {
 function drawDependencyGraph(ctx, tasks) {
     const width = 800;
     const height = 600;
-    const padding = 50;
+    const padding = 80;
+
+    // Clear with dark background
+    ctx.fillStyle = '#0f1117';
+    ctx.fillRect(0, 0, width, height);
 
     // Position nodes in a circle
     const centerX = width / 2;
@@ -564,14 +617,12 @@ function drawDependencyGraph(ctx, tasks) {
         const angle = (index / tasks.length) * 2 * Math.PI - Math.PI / 2;
         positions[task.id] = {
             x: centerX + radius * Math.cos(angle),
-            y: centerY + radius * Math.sin(angle)
+            y: centerY + radius * Math.sin(angle),
+            task: task
         };
     });
 
-    // Draw edges (dependencies)
-    ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
-    ctx.lineWidth = 2;
-
+    // Draw edges (dependencies) with gradient
     tasks.forEach(task => {
         if (task.dependencies && task.dependencies.length > 0) {
             task.dependencies.forEach(depId => {
@@ -579,69 +630,119 @@ function drawDependencyGraph(ctx, tasks) {
                     const from = positions[depId];
                     const to = positions[task.id];
 
+                    // Create gradient for arrow
+                    const gradient = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
+                    gradient.addColorStop(0, '#3b82f6');
+                    gradient.addColorStop(1, '#8b5cf6');
+
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+
                     // Draw arrow
                     drawArrow(ctx, from.x, from.y, to.x, to.y);
+                    ctx.setLineDash([]);
                 }
             });
         }
     });
 
-    // Draw nodes
+    // Draw nodes with priority-based colors
     tasks.forEach(task => {
         const pos = positions[task.id];
+        const priorityClass = task.priority_level.toLowerCase();
+
+        // Determine node color based on priority
+        let nodeColor, glowColor;
+        if (priorityClass === 'high') {
+            nodeColor = '#ef4444';
+            glowColor = 'rgba(239, 68, 68, 0.4)';
+        } else if (priorityClass === 'medium') {
+            nodeColor = '#f59e0b';
+            glowColor = 'rgba(245, 158, 11, 0.4)';
+        } else {
+            nodeColor = '#10b981';
+            glowColor = 'rgba(16, 185, 129, 0.4)';
+        }
+
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 32, 0, 2 * Math.PI);
+        ctx.fillStyle = glowColor;
+        ctx.fill();
 
         // Node circle
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 25, 0, 2 * Math.PI);
-        ctx.fillStyle = '#10b981';
+        ctx.arc(pos.x, pos.y, 28, 0, 2 * Math.PI);
+        ctx.fillStyle = nodeColor;
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#1a1d28';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Inner circle for depth
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 24, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 1;
         ctx.stroke();
 
         // Node ID
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 14px Inter';
+        ctx.font = 'bold 16px Inter';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(task.id, pos.x, pos.y);
 
-        // Node label
-        ctx.fillStyle = '#f1f5f9';
-        ctx.font = '12px Inter';
-        const label = task.title.length > 15 ? task.title.substring(0, 15) + '...' : task.title;
-        ctx.fillText(label, pos.x, pos.y + 40);
+        // Node label with background
+        const label = task.title.length > 18 ? task.title.substring(0, 18) + '...' : task.title;
+        ctx.font = '13px Inter';
+        const textWidth = ctx.measureText(label).width;
+
+        // Label background
+        ctx.fillStyle = 'rgba(26, 29, 40, 0.9)';
+        ctx.fillRect(pos.x - textWidth / 2 - 6, pos.y + 38, textWidth + 12, 22);
+        ctx.strokeStyle = nodeColor;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pos.x - textWidth / 2 - 6, pos.y + 38, textWidth + 12, 22);
+
+        // Label text
+        ctx.fillStyle = '#e5e7eb';
+        ctx.fillText(label, pos.x, pos.y + 49);
     });
 }
 
 function drawArrow(ctx, fromX, fromY, toX, toY) {
-    const headLength = 10;
+    const headLength = 12;
     const angle = Math.atan2(toY - fromY, toX - fromX);
 
     // Shorten the line to stop at the circle edge
-    const nodeRadius = 25;
+    const nodeRadius = 28;
+    const startX = fromX + nodeRadius * Math.cos(angle);
+    const startY = fromY + nodeRadius * Math.sin(angle);
     toX = toX - nodeRadius * Math.cos(angle);
     toY = toY - nodeRadius * Math.sin(angle);
 
     // Draw line
     ctx.beginPath();
-    ctx.moveTo(fromX, fromY);
+    ctx.moveTo(startX, startY);
     ctx.lineTo(toX, toY);
     ctx.stroke();
 
     // Draw arrowhead
+    ctx.fillStyle = ctx.strokeStyle;
     ctx.beginPath();
     ctx.moveTo(toX, toY);
     ctx.lineTo(
         toX - headLength * Math.cos(angle - Math.PI / 6),
         toY - headLength * Math.sin(angle - Math.PI / 6)
     );
-    ctx.moveTo(toX, toY);
     ctx.lineTo(
         toX - headLength * Math.cos(angle + Math.PI / 6),
         toY - headLength * Math.sin(angle + Math.PI / 6)
     );
-    ctx.stroke();
+    ctx.closePath();
+    ctx.fill();
 }
 
 // ==================== UTILITY FUNCTIONS ====================
