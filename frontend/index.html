@@ -195,12 +195,24 @@
                 </div>
             </div>
 
-            <!-- Results Content (Hidden Initially) -->
+            <!-- Results Content -->
             <div id="results-content" class="results-content" style="display: none;">
-                <!-- Top 3 Suggestions -->
+                <!-- Top Suggestions - Ready to Work -->
                 <div class="card suggestions-card">
-                    <h2 class="section-title">Top 3 Suggested Tasks</h2>
-                    <div id="suggestions-list" class="suggestions-list"></div>
+                    <h2 class="section-title">
+                        Ready to Work
+                        <span class="section-subtitle">Top priority tasks you can start now</span>
+                    </h2>
+                    <div id="ready-tasks-list" class="suggestions-list"></div>
+                </div>
+
+                <!-- Blocked Tasks (if any) -->
+                <div id="blocked-tasks-section" class="card blocked-card" style="display: none;">
+                    <h2 class="section-title">
+                        Blocked Tasks
+                        <span class="section-subtitle">High-priority tasks waiting on dependencies</span>
+                    </h2>
+                    <div id="blocked-tasks-list" class="suggestions-list"></div>
                 </div>
 
                 <!-- All Tasks Section -->

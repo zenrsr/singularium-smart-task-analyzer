@@ -498,6 +498,42 @@ textarea {
     margin-bottom: var(--space-l);
 }
 
+.section-subtitle {
+    display: block;
+    font-size: var(--font-sm);
+    font-weight: 400;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+}
+
+.blocked-card {
+    margin-bottom: var(--space-l);
+    border-color: #f59e0b;
+    background: linear-gradient(to bottom, rgba(245, 158, 11, 0.05), transparent);
+}
+
+.blocked-card .section-title {
+    color: #f59e0b;
+}
+
+.blocking-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-xs);
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    margin-top: var(--space-xs);
+}
+
+.blocking-badge-icon {
+    font-size: 14px;
+}
+
+
 .suggestion-item {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
