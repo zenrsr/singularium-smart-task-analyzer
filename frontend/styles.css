@@ -3,10 +3,18 @@
  * Design System: Clean, balanced, functional
  */
 
-/* ==================== VARIABLES ==================== */
+/* ==================== CSS VARIABLES ==================== */
 :root {
-    /* Colors - Obsidian Slate Theme */
+    /* Palette */
     --bg-app: #0b0d12;
+    --bg-panel: #14171f;
+    --bg-elevated: #1a1d28;
+    --bg-input: #0f1117;
+
+    /* Borders */
+    --border: #252932;
+    --border-focus: #4f7cff;
+
     /* Text */
     --text-main: #e5e7eb;
     --text-secondary: #9ca3af;
@@ -525,14 +533,6 @@ textarea {
     font-size: 14px;
 }
 
-.blocked-indicator {
-    font-size: 16px;
-    color: #f59e0b;
-    margin-left: 8px;
-    opacity: 0.7;
-}
-
-
 
 .suggestion-item {
     background: var(--bg-elevated);
@@ -726,21 +726,6 @@ textarea {
 }
 
 /* ==================== VISUALIZATION BUTTONS ==================== */
-.visualization-toolbar {
-    display: flex;
-    gap: var(--space-m);
-    justify-content: flex-end;
-    margin-bottom: var(--space-l);
-    padding: var(--space-m);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-}
-
-.visualization-toolbar .btn {
-    flex: 0 0 auto;
-}
-
 .visualization-buttons {
     display: flex;
     gap: var(--space-m);

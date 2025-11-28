@@ -58,10 +58,7 @@ const elements = {
     // Results
     welcomeState: document.getElementById('welcome-state'),
     resultsContent: document.getElementById('results-content'),
-    top3List: document.getElementById('top3-list'),
-    readyTasksList: document.getElementById('ready-tasks-list'),
-    blockedTasksList: document.getElementById('blocked-tasks-list'),
-    blockedTasksSection: document.getElementById('blocked-tasks-section'),
+    suggestionsList: document.getElementById('suggestions-list'),
     allTasksList: document.getElementById('all-tasks-list'),
     tasksTotal: document.getElementById('tasks-total'),
 
@@ -417,120 +414,51 @@ function setLoading(isLoading) {
 function displayResults(data) {
     elements.welcomeState.style.display = 'none';
     elements.resultsContent.style.display = 'block';
-
     const tasks = data.tasks;
     elements.tasksTotal.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
     currentPage = 1;
 
-    // Display Top 3 Overall (by score)
-    displayTop3Overall(tasks.slice(0, 3));
-
-    // Separate ready and blocked tasks
-    const { ready, blocked } = separateReadyAndBlockedTasks(tasks);
-
-    // Display ready tasks (top 3)
-    displayReadyTasks(ready.slice(0, 3));
-
-    // Display blocked tasks if any
-    displayBlockedTasks(blocked);
+    // Display top 3 suggestions
+    displaySuggestions(tasks.slice(0, 3));
 
     // Display all tasks with pagination
     displayAllTasks(tasks);
 }
 
-function separateReadyAndBlockedTasks(tasks) {
-    const taskIds = new Set(tasks.map(t => t.id));
-    const ready = [];
-    const blocked = [];
-
-    tasks.forEach(task => {
-        if (!task.dependencies || task.dependencies.length === 0) {
-            // No dependencies - ready to work
-            ready.push(task);
-        } else {
-            // Has dependencies - check if they exist in current task list
-            const hasUnmetDeps = task.dependencies.some(depId => taskIds.has(depId));
-            if (hasUnmetDeps) {
-                blocked.push(task);
-            } else {
-                // Dependencies don't exist in list (maybe completed) - consider ready
-                ready.push(task);
-            }
-        }
-    });
-
-    return { ready, blocked };
-}
-
-function displayTop3Overall(topTasks) {
+function displaySuggestions(topTasks) {
     if (topTasks.length === 0) {
-        elements.top3List.innerHTML = '<p style="color: var(--text-secondary); padding: var(--space-m);">No tasks to display</p>';
+        elements.suggestionsList.innerHTML = '<p style="color: var(--text-muted);">No tasks to suggest</p>';
         return;
     }
 
-    elements.top3List.innerHTML = topTasks.map((task, index) => {
-        const isBlocked = task.dependencies && task.dependencies.length > 0;
-        const blockBadge = isBlocked ? '<span class="blocked-indicator" title="Has dependencies">⚠</span>' : '';
+    const taskIds = new Set(currentTasks.map(t => t.id));
+
+    elements.suggestionsList.innerHTML = topTasks.map((task, index) => {
+        // Check for blocking dependencies
+        let blockingBadge = '';
+        if (task.dependencies && task.dependencies.length > 0) {
+            const blockingDeps = task.dependencies.filter(depId => taskIds.has(depId));
+
+            if (blockingDeps.length > 0) {
+                const depNames = blockingDeps
+                    .map(depId => {
+                        const depTask = currentTasks.find(t => t.id === depId);
+                        return depTask ? `#${depId}: ${depTask.title}` : `Task #${depId}`;
+                    })
+                    .join(', ');
+
+                blockingBadge = `
+                    <div class="blocking-badge">
+                        <span class="blocking-badge-icon">⚠</span>
+                        <span>Waiting on: ${depNames}</span>
+                    </div>
+                `;
+            }
+        }
 
         return `
             <div class="suggestion-item">
                 <div class="suggestion-rank">#${index + 1}</div>
-                <h3 class="suggestion-title">${escapeHtml(task.title)} ${blockBadge}</h3>
-                <div class="task-details">
-                    <span>Due: ${formatDate(task.due_date)}</span>
-                    <span>${task.estimated_hours}h</span>
-                    <span>Importance: ${task.importance}/10</span>
-                    <span>Score: ${task.score}</span>
-                </div>
-                <p class="suggestion-reason">${escapeHtml(task.explanation)}</p>
-            </div>
-        `;
-    }).join('');
-}
-
-function displayReadyTasks(readyTasks) {
-    if (readyTasks.length === 0) {
-        elements.readyTasksList.innerHTML = '<p style="color: var(--text-secondary); padding: var(--space-m);">All high-priority tasks are blocked by dependencies. Check the blocked section below.</p>';
-        return;
-    }
-
-    elements.readyTasksList.innerHTML = readyTasks.map((task, index) => `
-        <div class="suggestion-item">
-            <div class="suggestion-rank">#${index + 1}</div>
-            <h3 class="suggestion-title">${escapeHtml(task.title)}</h3>
-            <div class="task-details">
-                <span>Due: ${formatDate(task.due_date)}</span>
-                <span>${task.estimated_hours}h</span>
-                <span>Importance: ${task.importance}/10</span>
-                <span>Score: ${task.score}</span>
-            </div>
-            <p class="suggestion-reason">${escapeHtml(task.explanation)}</p>
-        </div>
-    `).join('');
-}
-
-function displayBlockedTasks(blockedTasks) {
-    if (blockedTasks.length === 0) {
-        elements.blockedTasksSection.style.display = 'none';
-        return;
-    }
-
-    elements.blockedTasksSection.style.display = 'block';
-
-    // Show top 3 blocked tasks
-    const topBlocked = blockedTasks.slice(0, 3);
-
-    elements.blockedTasksList.innerHTML = topBlocked.map((task, index) => {
-        const depNames = task.dependencies
-            .map(depId => {
-                const depTask = currentTasks.find(t => t.id === depId);
-                return depTask ? `#${depId}: ${depTask.title}` : `Task #${depId}`;
-            })
-            .join(', ');
-
-        return `
-            <div class="suggestion-item">
-                <div class="suggestion-rank">Blocked</div>
                 <h3 class="suggestion-title">${escapeHtml(task.title)}</h3>
                 <div class="task-details">
                     <span>Due: ${formatDate(task.due_date)}</span>
@@ -538,10 +466,7 @@ function displayBlockedTasks(blockedTasks) {
                     <span>Importance: ${task.importance}/10</span>
                     <span>Score: ${task.score}</span>
                 </div>
-                <div class="blocking-badge">
-                    <span class="blocking-badge-icon">⚠</span>
-                    <span>Waiting on: ${depNames}</span>
-                </div>
+                ${blockingBadge}
                 <p class="suggestion-reason">${escapeHtml(task.explanation)}</p>
             </div>
         `;
