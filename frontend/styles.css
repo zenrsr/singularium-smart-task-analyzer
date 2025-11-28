@@ -158,7 +158,13 @@ body {
     display: block;
 }
 
-/* ==================== FORMS ==================== */
+/* ==================== FORM ELEMENTS ==================== */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-m);
+}
+
 .form-group {
     margin-bottom: var(--space-m);
 }
@@ -168,12 +174,10 @@ body {
     font-size: var(--font-sm);
     font-weight: 500;
     color: var(--text-secondary);
-    margin-bottom: 6px;
+    margin-bottom: var(--space-xs);
 }
 
-.form-group input,
-.form-group textarea,
-.strategy-select {
+.form-control {
     width: 100%;
     background: var(--bg-input);
     border: 1px solid var(--border);
@@ -181,13 +185,13 @@ body {
     padding: 10px 12px;
     color: var(--text-main);
     font-size: var(--font-base);
-    font-family: inherit;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
-.strategy-select:focus {
+.strategy-select:focus,
+.form-control:focus {
     outline: none;
     border-color: var(--accent);
 }
@@ -460,6 +464,28 @@ textarea {
     color: var(--high);
 }
 
+/* ==================== HEADER ==================== */
+header {
+    text-align: center;
+    padding: var(--space-xl) 0 var(--space-l);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-l);
+    background: var(--bg-card);
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-xs);
+    color: var(--text-main);
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: var(--font-base);
+}
+
 /* ==================== RESULTS ==================== */
 .welcome-state {
     text-align: center;
@@ -467,7 +493,8 @@ textarea {
 }
 
 .welcome-state h2 {
-    font-size: var(--font-xl);
+    font-size: 2.5rem;
+    font-weight: 700;
     margin-bottom: var(--space-s);
 }
 

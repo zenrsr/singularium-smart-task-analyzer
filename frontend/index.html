@@ -43,18 +43,20 @@
                 <form id="task-form" class="task-form">
                     <div class="form-group">
                         <label for="task-title">Task Title *</label>
-                        <input type="text" id="task-title" placeholder="e.g., Fix login bug" required>
+                        <input type="text" id="task-title" class="form-control" placeholder="e.g., Fix login bug"
+                            required>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="task-date">Due Date *</label>
-                            <input type="date" id="task-date" required>
+                            <input type="date" id="task-date" class="form-control" required>
                         </div>
 
                         <div class="form-group">
                             <label for="task-hours">Estimated Hours *</label>
-                            <input type="number" id="task-hours" min="1" max="100" placeholder="3" required>
+                            <input type="number" id="task-hours" class="form-control" min="0.5" step="0.5"
+                                placeholder="e.g., 2.5" required>
                         </div>
                     </div>
 
@@ -107,7 +109,7 @@
             <!-- Strategy Selector -->
             <div class="strategy-section">
                 <h3>Scoring Strategy</h3>
-                <select id="strategy-selector" class="strategy-select">
+                <select id="strategy-selector" class="strategy-select form-control">
                     <option value="smart_balance">Smart Balance (Recommended)</option>
                     <option value="fastest_wins">Fastest Wins</option>
                     <option value="high_impact">High Impact</option>
