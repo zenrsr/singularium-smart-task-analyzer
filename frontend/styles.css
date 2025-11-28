@@ -219,6 +219,75 @@ textarea {
     font-style: italic;
 }
 
+/* ==================== DEPENDENCY SELECTOR ==================== */
+.dependency-selector {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    max-height: 200px;
+    overflow-y: auto;
+    padding: var(--space-xs);
+}
+
+.dependency-selector .empty-state {
+    padding: var(--space-m);
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: var(--font-sm);
+}
+
+.dependency-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-s);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+}
+
+.dependency-item:hover {
+    background: var(--bg-elevated);
+}
+
+.dependency-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+.dependency-item .task-id {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    background: var(--border);
+    color: var(--text-secondary);
+    border-radius: 50%;
+    font-size: var(--font-xs);
+    font-weight: 600;
+}
+
+.dependency-item .task-title {
+    flex: 1;
+    font-size: var(--font-sm);
+    color: var(--text-main);
+}
+
+.dependency-item input[type="checkbox"]:checked+.task-id {
+    background: var(--accent);
+    color: white;
+}
+
+.dependency-item input[type="checkbox"]:checked~.task-title {
+    font-weight: 500;
+    color: var(--accent);
+}
+
+
 
 /* ==================== BUTTONS ==================== */
 .btn {
@@ -297,14 +366,23 @@ textarea {
     margin-top: var(--space-l);
     padding-top: var(--space-l);
     border-top: 1px solid var(--border);
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
 }
 
-.advanced-config summary {
-    font-size: var(--font-sm);
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-    user-select: none;
+.advanced-config.hidden {
+    max-height: 0;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+.config-header {
+    font-size: var(--font-base);
+    font-weight: 600;
+    margin-bottom: var(--space-m);
+    color: var(--text-main);
 }
 
 .weight-sliders {

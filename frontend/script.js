@@ -82,6 +82,12 @@ const elements = {
     prevPageBtn: document.getElementById('prev-page-btn'),
     nextPageBtn: document.getElementById('next-page-btn'),
     pageInfo: document.getElementById('page-info'),
+
+    // Dependency Selector
+    dependencySelector: document.getElementById('dependency-selector'),
+
+    // Advanced Config
+    advancedConfig: document.getElementById('advanced-config'),
 };
 
 // ==================== INITIALIZATION ====================
@@ -105,7 +111,10 @@ function setupEventListeners() {
     elements.loadJsonBtn.addEventListener('click', loadJSONTasks);
 
     // Strategy
-    elements.strategySelector.addEventListener('change', updateStrategyDescription);
+    elements.strategySelector.addEventListener('change', () => {
+        updateStrategyDescription();
+        toggleAdvancedConfig();
+    });
 
     // Weights
     [elements.weightUrgency, elements.weightImportance, elements.weightEffort, elements.weightDependencies]
@@ -176,7 +185,7 @@ function handleFormSubmit(e) {
         due_date: elements.taskDate.value,
         estimated_hours: parseInt(elements.taskHours.value),
         importance: parseInt(elements.taskImportance.value),
-        dependencies: parseDependencies(elements.taskDependencies.value)
+        dependencies: getSelectedDependencies() // Use checkbox selector
     };
 
     currentTasks.push(task);
@@ -198,6 +207,7 @@ function updateTaskPreview() {
 
     if (currentTasks.length === 0) {
         elements.taskListPreview.innerHTML = '<p style="color: var(--text-muted); font-size: 0.875rem;">No tasks added yet</p>';
+        renderDependencySelector(); // Update dependency selector
         return;
     }
 
@@ -207,6 +217,9 @@ function updateTaskPreview() {
             <button class="task-preview-remove" onclick="removeTask(${index})" type="button">&times;</button>
         </div>
     `).join('');
+
+    // Update dependency selector with new tasks
+    renderDependencySelector();
 }
 
 function removeTask(index) {
@@ -214,6 +227,29 @@ function removeTask(index) {
     // Reassign IDs
     currentTasks = currentTasks.map((task, i) => ({ ...task, id: i + 1 }));
     updateTaskPreview();
+}
+
+// ==================== DEPENDENCY SELECTOR ====================
+function renderDependencySelector() {
+    const container = elements.dependencySelector;
+
+    if (currentTasks.length === 0) {
+        container.innerHTML = '<p class="empty-state">No tasks added yet</p>';
+        return;
+    }
+
+    container.innerHTML = currentTasks.map(task => `
+        <label class="dependency-item">
+            <input type="checkbox" value="${task.id}" name="dependency" data-task-id="${task.id}">
+            <span class="task-id">${task.id}</span>
+            <span class="task-title">${escapeHtml(task.title)}</span>
+        </label>
+    `).join('');
+}
+
+function getSelectedDependencies() {
+    const checkboxes = document.querySelectorAll('#dependency-selector input[type="checkbox"]:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.value));
 }
 
 // ==================== JSON LOADING ====================
@@ -245,12 +281,23 @@ const strategyDescriptions = {
     'smart_balance': 'Balances urgency, importance, effort, and dependencies for optimal prioritization',
     'fastest_wins': 'Prioritizes quick tasks (low effort) to help you get fast wins and build momentum',
     'high_impact': 'Focuses solely on importance ratings to tackle high-value tasks first',
-    'deadline_driven': 'Sorts by due dates to help you meet deadlines and avoid overdue tasks'
+    'deadline_driven': 'Sorts by due dates to help you meet deadlines and avoid overdue tasks',
+    'custom': 'Customize scoring algorithm with your own weight distribution'
 };
 
 function updateStrategyDescription() {
     const strategy = elements.strategySelector.value;
     elements.strategyDescription.textContent = strategyDescriptions[strategy] || '';
+}
+
+function toggleAdvancedConfig() {
+    const strategy = elements.strategySelector.value;
+
+    if (strategy === 'custom') {
+        elements.advancedConfig.style.display = 'block';
+    } else {
+        elements.advancedConfig.style.display = 'none';
+    }
 }
 
 // ==================== WEIGHT MANAGEMENT ====================

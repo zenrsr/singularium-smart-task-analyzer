@@ -68,10 +68,11 @@
                     <div class="form-group">
                         <label for="task-dependencies">
                             Dependencies
-                            <span class="help-text">(Enter task IDs this task depends on)</span>
+                            <span class="help-text">(Select tasks this task depends on)</span>
                         </label>
-                        <input type="text" id="task-dependencies" placeholder="e.g., 1, 2, 3">
-                        <small class="field-hint">Tasks will be blocked if dependencies aren't completed first</small>
+                        <div id="dependency-selector" class="dependency-selector">
+                            <p class="empty-state">No tasks added yet</p>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-secondary">
                         <span>➕ Add Task</span>
@@ -111,6 +112,7 @@
                     <option value="fastest_wins">Fastest Wins</option>
                     <option value="high_impact">High Impact</option>
                     <option value="deadline_driven">Deadline Driven</option>
+                    <option value="custom">Custom (Adjust Weights)</option>
                 </select>
 
                 <div class="strategy-description" id="strategy-description">
@@ -118,9 +120,9 @@
                 </div>
             </div>
 
-            <!-- Advanced Configuration (Collapsible) -->
-            <details class="advanced-config">
-                <summary>Advanced Configuration</summary>
+            <!-- Advanced Configuration (Conditional - Custom Strategy Only) -->
+            <div id="advanced-config" class="advanced-config" style="display: none;">
+                <h3 class="config-header">Weight Configuration</h3>
                 <div class="weight-sliders">
                     <p class="config-note">Customize scoring weights (must sum to 100%)</p>
 
@@ -157,9 +159,9 @@
                     </label>
 
                     <p class="total-weight" id="total-weight">Total: <strong>100%</strong></p>
-                    <button id="reset-weights-btn" class="btn btn-ghost">Reset to Default</button>
+                    <button id="reset-weights-btn" type="button" class="btn btn-ghost">Reset to Default</button>
                 </div>
-            </details>
+            </div>
 
             <!-- Analyze Button -->
             <button id="analyze-btn" class="btn btn-primary">

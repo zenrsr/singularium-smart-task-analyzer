@@ -1,0 +1,55 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.0, pytest-9.0.1, pluggy-1.6.0 -- /Users/subbarangareddy/Desktop/singularium/venv/bin/python3.14
+cachedir: .pytest_cache
+django: version: 5.2.8, settings: backend.settings (from ini)
+rootdir: /Users/subbarangareddy/Desktop/singularium
+configfile: pytest.ini
+testpaths: tasks
+plugins: django-4.11.1, cov-7.0.0
+collecting ... collected 38 items
+
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_1000_hour_task PASSED [  2%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_100_tasks_performance PASSED [  5%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_all_strategies_with_same_task PASSED [  7%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_complex_circular_dependency_chain PASSED [ 10%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_empty_task_list PASSED [ 13%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_extremely_long_title PASSED [ 15%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_importance_over_10 PASSED [ 18%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_importance_under_1 PASSED [ 21%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_invalid_date_format PASSED [ 23%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_invalid_dependency_ids PASSED [ 26%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_missing_required_fields PASSED [ 28%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_missing_weight_keys PASSED [ 31%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_multiple_circular_chains PASSED [ 34%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_negative_hours_task PASSED [ 36%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_self_dependency PASSED [ 39%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_special_characters_title PASSED [ 42%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_unicode_characters_in_title PASSED [ 44%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_weights_sum_over_1 PASSED [ 47%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_weights_sum_to_zero PASSED [ 50%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_year_1900_due_date FAILED [ 52%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_year_2100_due_date PASSED [ 55%]
+tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_zero_hours_task PASSED [ 57%]
+tasks/tests.py::ScoringAlgorithmTests::test_custom_weights PASSED        [ 60%]
+tasks/tests.py::ScoringAlgorithmTests::test_dependency_blocking PASSED   [ 63%]
+tasks/tests.py::ScoringAlgorithmTests::test_missing_due_date PASSED      [ 65%]
+tasks/tests.py::ScoringAlgorithmTests::test_overdue_task_high_score PASSED [ 68%]
+tasks/tests.py::ScoringAlgorithmTests::test_quick_win_bonus PASSED       [ 71%]
+tasks/tests.py::CircularDependencyTests::test_complex_circular_dependency PASSED [ 73%]
+tasks/tests.py::CircularDependencyTests::test_no_circular_dependencies PASSED [ 76%]
+tasks/tests.py::CircularDependencyTests::test_simple_circular_dependency PASSED [ 78%]
+tasks/tests.py::APIEndpointTests::test_analyze_endpoint_invalid_data PASSED [ 81%]
+tasks/tests.py::APIEndpointTests::test_analyze_endpoint_valid_data PASSED [ 84%]
+tasks/tests.py::APIEndpointTests::test_suggest_endpoint PASSED           [ 86%]
+tasks/tests.py::APIEndpointTests::test_validate_dependencies_endpoint PASSED [ 89%]
+tasks/tests.py::ScoringStrategyTests::test_deadline_driven_strategy PASSED [ 92%]
+tasks/tests.py::ScoringStrategyTests::test_fastest_wins_strategy PASSED  [ 94%]
+tasks/tests.py::ScoringStrategyTests::test_get_scorer_factory PASSED     [ 97%]
+tasks/tests.py::ScoringStrategyTests::test_high_impact_strategy PASSED   [100%]
+
+=================================== FAILURES ===================================
+E   AssertionError: 55.0 not greater than 100 : Tasks 100+ years overdue should have maximum priority
+/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py:750: AssertionError: 55.0 not greater than 100 : Tasks 100+ years overdue should have maximum priority
+=========================== short test summary info ============================
+FAILED tasks/test_edge_cases.py::ExtremeEdgeCaseTests::test_year_1900_due_date - AssertionError: 55.0 not greater than 100 : Tasks 100+ years overdue should have maximum priority
+========================= 1 failed, 37 passed in 0.20s =========================
