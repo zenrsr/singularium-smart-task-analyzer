@@ -1,0 +1,5 @@
+Django>=5.0.0
+djangorestframework>=3.16.0
+pytest>=9.0.0
+pytest-django>=4.11.0
+pytest-cov>=7.0.0
