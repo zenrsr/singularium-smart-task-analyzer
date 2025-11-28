@@ -18,242 +18,212 @@
 </head>
 
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <h1 class="header-title">Smart Task Analyzer</h1>
-            <p class="header-subtitle">Intelligent prioritization for modern workflows</p>
-        </div>
-    </header>
+    <div class="app-layout">
+        <!-- LEFT SIDEBAR: CONTROLS -->
+        <aside class="app-sidebar">
+            <header class="sidebar-header">
+                <div class="logo-mark">
+                    <div class="logo-icon"></div>
+                </div>
+                <div>
+                    <h1>Singularium</h1>
+                    <p class="subtitle">Intelligent Task Orchestration</p>
+                </div>
+            </header>
 
-    <!-- Main Container -->
-    <main class="container">
-        <!-- Left Panel: Input Section -->
-        <section class="input-panel card">
-            <h2 class="section-title">Task Input</h2>
+            <div class="sidebar-content">
+                <!-- Input Tabs -->
+                <div class="input-tabs">
+                    <button class="tab-btn active" data-tab="form-input">Manual Entry</button>
+                    <button class="tab-btn" data-tab="json-input">JSON Import</button>
+                </div>
 
-            <!-- Tab Switcher -->
-            <div class="tab-switcher">
-                <button class="tab-button active" data-tab="form">Form Input</button>
-                <button class="tab-button" data-tab="json">JSON Bulk Input</button>
-            </div>
-
-            <!-- Form Input Tab -->
-            <div id="form-tab" class="tab-content active">
-                <form id="task-form" class="task-form">
-                    <div class="form-group">
-                        <label for="task-title">Task Title *</label>
-                        <input type="text" id="task-title" placeholder="e.g., Fix login bug" required>
-                    </div>
-
-                    <div class="form-row">
+                <!-- Form Input Section -->
+                <section id="form-input" class="input-section active">
+                    <form id="task-form">
                         <div class="form-group">
-                            <label for="task-date">Due Date *</label>
-                            <input type="date" id="task-date" required>
+                            <label for="task-title">Task Title <span class="required">*</span></label>
+                            <input type="text" id="task-title" placeholder="What needs to be done?" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="task-date">Due Date <span class="required">*</span></label>
+                                <input type="date" id="task-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="task-hours">Est. Hours <span class="required">*</span></label>
+                                <input type="number" id="task-hours" min="0.5" step="0.5" placeholder="e.g. 2" required>
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="task-hours">Estimated Hours *</label>
-                            <input type="number" id="task-hours" min="1" max="100" placeholder="3" required>
+                            <label>Importance: <span id="importance-value" class="highlight-value">5</span>/10</label>
+                            <input type="range" id="task-importance" min="1" max="10" value="5" class="slider">
+                            <div class="slider-labels">
+                                <span>Low</span>
+                                <span>High</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Dependencies <span class="help-text">(Select prerequisites)</span></label>
+                            <div id="dependency-selector" class="dependency-selector">
+                                <p class="empty-state">No other tasks available</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <span>Add Task to Queue</span>
+                        </button>
+                    </form>
+                </section>
+
+                <!-- JSON Input Section -->
+                <section id="json-input" class="input-section">
+                    <div class="form-group">
+                        <label for="json-data">Paste JSON Data</label>
+                        <textarea id="json-data" placeholder='[{"title": "Task 1", ...}]'></textarea>
+                    </div>
+                    <button id="load-json-btn" class="btn btn-secondary btn-block">Load Data</button>
+                </section>
+
+                <!-- Current Queue Preview -->
+                <div class="queue-preview">
+                    <div class="queue-header">
+                        <h3>Task Queue</h3>
+                        <span id="task-count" class="badge">0</span>
+                    </div>
+                    <div id="task-list-preview" class="queue-list">
+                        <p class="empty-queue">Queue is empty</p>
+                    </div>
+                </div>
+
+                <!-- Strategy & Config -->
+                <div class="strategy-panel">
+                    <h3>Analysis Configuration</h3>
+                    <div class="form-group">
+                        <label for="strategy-selector">Prioritization Strategy</label>
+                        <select id="strategy-selector" class="strategy-select">
+                            <option value="smart_balance">Smart Balance (Recommended)</option>
+                            <option value="fastest_wins">Fastest Wins</option>
+                            <option value="high_impact">High Impact</option>
+                            <option value="deadline_driven">Deadline Driven</option>
+                            <option value="custom">Custom Configuration</option>
+                        </select>
+                        <p id="strategy-description" class="strategy-hint">Balances all factors for optimal results</p>
+                    </div>
+
+                    <div id="advanced-config" class="advanced-config" style="display: none;">
+                        <h4>Weight Distribution</h4>
+                        <div class="weight-sliders">
+                            <label>Urgency <span id="weight-urgency-value">40</span>%
+                                <input type="range" id="weight-urgency" min="0" max="100" value="40" class="slider">
+                            </label>
+                            <label>Importance <span id="weight-importance-value">30</span>%
+                                <input type="range" id="weight-importance" min="0" max="100" value="30" class="slider">
+                            </label>
+                            <label>Effort <span id="weight-effort-value">20</span>%
+                                <input type="range" id="weight-effort" min="0" max="100" value="20" class="slider">
+                            </label>
+                            <label>Dependencies <span id="weight-dependencies-value">10</span>%
+                                <input type="range" id="weight-dependencies" min="0" max="100" value="10"
+                                    class="slider">
+                            </label>
+                            <div class="weight-footer">
+                                <span id="total-weight">Total: 100%</span>
+                                <button id="reset-weights-btn" class="btn-text">Reset</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="task-importance">
-                            Importance: <span id="importance-value">5</span>/10
-                        </label>
-                        <input type="range" id="task-importance" min="1" max="10" value="5" class="slider">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="task-dependencies">
-                            Dependencies
-                            <span class="help-text">(Select tasks this task depends on)</span>
-                        </label>
-                        <div id="dependency-selector" class="dependency-selector">
-                            <p class="empty-state">No tasks added yet</p>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-secondary">
-                        <span>➕ Add Task</span>
+                    <button id="analyze-btn" class="btn btn-accent btn-lg btn-block">
+                        <span id="analyze-btn-text">Analyze & Prioritize</span>
+                        <span id="analyze-loader" class="loader" style="display: none;"></span>
                     </button>
-                </form>
-
-                <div id="current-tasks" class="current-tasks">
-                    <h3>Current Tasks (<span id="task-count">0</span>)</h3>
-                    <div id="task-list-preview" class="task-list-preview"></div>
                 </div>
             </div>
+        </aside>
 
-            <!-- JSON Input Tab -->
-            <div id="json-tab" class="tab-content">
-                <div class="form-group">
-                    <label for="json-input">Paste JSON Array of Tasks</label>
-                    <textarea id="json-input" rows="12" placeholder='[
-  {
-    "title": "Fix login bug",
-    "due_date": "2025-12-01",
-    "estimated_hours": 3,
-    "importance": 8,
-    "dependencies": []
-  }
-]'></textarea>
-                </div>
-                <button id="load-json-btn" class="btn btn-secondary">
-                    <span>📥 Load JSON Tasks</span>
-                </button>
-            </div>
-
-            <!-- Strategy Selector -->
-            <div class="strategy-section">
-                <h3>Scoring Strategy</h3>
-                <select id="strategy-selector" class="strategy-select">
-                    <option value="smart_balance">Smart Balance (Recommended)</option>
-                    <option value="fastest_wins">Fastest Wins</option>
-                    <option value="high_impact">High Impact</option>
-                    <option value="deadline_driven">Deadline Driven</option>
-                    <option value="custom">Custom (Adjust Weights)</option>
-                </select>
-
-                <div class="strategy-description" id="strategy-description">
-                    Balances urgency, importance, effort, and dependencies for optimal prioritization
-                </div>
-            </div>
-
-            <!-- Advanced Configuration (Conditional - Custom Strategy Only) -->
-            <div id="advanced-config" class="advanced-config" style="display: none;">
-                <h3 class="config-header">Weight Configuration</h3>
-                <div class="weight-sliders">
-                    <p class="config-note">Customize scoring weights (must sum to 100%)</p>
-
-                    <label>
-                        <span class="weight-label">
-                            <span class="weight-icon"></span>
-                            Urgency Weight: <strong><span id="weight-urgency-value">40</span>%</strong>
-                        </span>
-                        <input type="range" id="weight-urgency" min="0" max="100" value="40" class="slider">
-                    </label>
-
-                    <label>
-                        <span class="weight-label">
-                            <span class="weight-icon"></span>
-                            Importance Weight: <strong><span id="weight-importance-value">30</span>%</strong>
-                        </span>
-                        <input type="range" id="weight-importance" min="0" max="100" value="30" class="slider">
-                    </label>
-
-                    <label>
-                        <span class="weight-label">
-                            <span class="weight-icon"></span>
-                            Effort Weight: <strong><span id="weight-effort-value">20</span>%</strong>
-                        </span>
-                        <input type="range" id="weight-effort" min="0" max="100" value="20" class="slider">
-                    </label>
-
-                    <label>
-                        <span class="weight-label">
-                            <span class="weight-icon"></span>
-                            Dependency Weight: <strong><span id="weight-dependencies-value">10</span>%</strong>
-                        </span>
-                        <input type="range" id="weight-dependencies" min="0" max="100" value="10" class="slider">
-                    </label>
-
-                    <p class="total-weight" id="total-weight">Total: <strong>100%</strong></p>
-                    <button id="reset-weights-btn" type="button" class="btn btn-ghost">Reset to Default</button>
-                </div>
-            </div>
-
-            <!-- Analyze Button -->
-            <button id="analyze-btn" class="btn btn-primary">
-                <span id="analyze-btn-text">Analyze Tasks</span>
-                <span id="analyze-loader" class="loader" style="display: none;"></span>
-            </button>
-        </section>
-
-        <!-- Right Panel: Results Section -->
-        <section class="results-panel">
+        <!-- MAIN CONTENT: RESULTS DASHBOARD -->
+        <main class="app-main">
             <!-- Welcome State -->
             <div id="welcome-state" class="welcome-state">
-                <div class="welcome-icon"></div>
-                <h2>Welcome to Smart Task Analyzer</h2>
-                <p>Add tasks using the form or paste JSON data, then click "Analyze Tasks" to see intelligent
-                    prioritization</p>
-
-                <div class="features">
-                    <div class="feature-item">
-
-                        <span>Multiple scoring strategies</span>
-                    </div>
-                    <div class="feature-item">
-
-                        <span>Customizable weights</span>
-                    </div>
-                    <div class="feature-item">
-
-                        <span>Dependency detection</span>
-                    </div>
+                <div class="welcome-content">
+                    <div class="welcome-icon">⚡</div>
+                    <h2>Ready to Optimize</h2>
+                    <p>Add tasks to the queue to generate your intelligent execution plan.</p>
                 </div>
             </div>
 
-            <!-- Results Content -->
-            <div id="results-content" class="results-content" style="display: none;">
-                <!-- Visualization Buttons (Prominent) -->
-                <div class="visualization-toolbar">
-                    <button id="show-matrix-btn" class="btn btn-ghost">
-                        Eisenhower Matrix
-                    </button>
-                    <button id="show-graph-btn" class="btn btn-ghost">
-                        Dependency Graph
-                    </button>
+            <!-- Results Dashboard -->
+            <div id="results-content" class="results-dashboard" style="display: none;">
+                <!-- Sticky Toolbar -->
+                <div class="dashboard-toolbar">
+                    <div class="toolbar-left">
+                        <h2>Analysis Results</h2>
+                        <span id="tasks-total" class="stats-badge">0 Tasks</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button id="show-matrix-btn" class="btn btn-outline">
+                            <span class="icon">⊞</span> Eisenhower Matrix
+                        </button>
+                        <button id="show-graph-btn" class="btn btn-outline">
+                            <span class="icon">🕸</span> Dependency Graph
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Top 3 Overall (By Score) -->
-                <div class="card suggestions-card">
-                    <h2 class="section-title">
-                        Top 3 Overall
-                        <span class="section-subtitle">Highest priority tasks by score</span>
-                    </h2>
-                    <div id="top3-list" class="suggestions-list"></div>
+                <div class="dashboard-grid">
+                    <!-- High Priority Column -->
+                    <div class="dashboard-col">
+                        <!-- Ready to Work -->
+                        <section class="dashboard-card highlight-card">
+                            <header class="card-header">
+                                <h3>🚀 Ready to Work</h3>
+                                <span class="card-subtitle">Actionable Now</span>
+                            </header>
+                            <div id="ready-tasks-list" class="task-list-compact"></div>
+                        </section>
+
+                        <!-- Blocked Tasks -->
+                        <section id="blocked-tasks-section" class="dashboard-card warning-card" style="display: none;">
+                            <header class="card-header">
+                                <h3>⏳ Blocked</h3>
+                                <span class="card-subtitle">Waiting on Dependencies</span>
+                            </header>
+                            <div id="blocked-tasks-list" class="task-list-compact"></div>
+                        </section>
+                    </div>
+
+                    <!-- Strategic View Column -->
+                    <div class="dashboard-col">
+                        <!-- Top 3 Overall -->
+                        <section class="dashboard-card">
+                            <header class="card-header">
+                                <h3>🏆 Strategic Top 3</h3>
+                                <span class="card-subtitle">Highest Value Tasks</span>
+                            </header>
+                            <div id="top3-list" class="task-list-compact"></div>
+                        </section>
+                    </div>
                 </div>
 
-                <!-- Ready to Work -->
-                <div class="card suggestions-card">
-                    <h2 class="section-title">
-                        Ready to Work
-                        <span class="section-subtitle">Top priority tasks you can start now</span>
-                    </h2>
-                    <div id="ready-tasks-list" class="suggestions-list"></div>
-                </div>
-
-                <!-- Blocked Tasks (if any) -->
-                <div id="blocked-tasks-section" class="card blocked-card" style="display: none;">
-                    <h2 class="section-title">
-                        Blocked Tasks
-                        <span class="section-subtitle">High-priority tasks waiting on dependencies</span>
-                    </h2>
-                    <div id="blocked-tasks-list" class="suggestions-list"></div>
-                </div>
-
-                <!-- All Tasks Section -->
-                <div class="card">
-                    <div class="tasks-header">
-                        <h2 class="section-title">All Tasks (Sorted by Priority)</h2>
-                        <div class="tasks-stats">
-                            <span id="tasks-total">0 tasks</span>
+                <!-- All Tasks Table -->
+                <section class="dashboard-card full-width">
+                    <header class="card-header">
+                        <h3>All Tasks</h3>
+                        <div id="pagination-controls" class="pagination-controls" style="display: none;">
+                            <button id="prev-page-btn" class="btn-icon" disabled>←</button>
+                            <span id="page-info">Page 1</span>
+                            <button id="next-page-btn" class="btn-icon" disabled>→</button>
                         </div>
-                    </div>
-                    <div id="all-tasks-list" class="all-tasks-list"></div>
-
-                    <!-- Pagination Controls -->
-                    <div id="pagination-controls" class="pagination-controls" style="display: none;">
-                        <button id="prev-page-btn" class="pagination-btn" disabled>Previous</button>
-                        <span id="page-info" class="page-info">Page 1 of 1</span>
-                        <button id="next-page-btn" class="pagination-btn" disabled>Next</button>
-                    </div>
-                </div>
+                    </header>
+                    <div id="all-tasks-list" class="all-tasks-grid"></div>
+                </section>
             </div>
-        </section>
-    </main>
+        </main>
+    </div>
 
     <!-- Error Toast -->
     <div id="error-toast" class="toast error-toast" style="display: none;">
