@@ -58,6 +58,7 @@ const elements = {
     // Results
     welcomeState: document.getElementById('welcome-state'),
     resultsContent: document.getElementById('results-content'),
+    top3List: document.getElementById('top3-list'),
     readyTasksList: document.getElementById('ready-tasks-list'),
     blockedTasksList: document.getElementById('blocked-tasks-list'),
     blockedTasksSection: document.getElementById('blocked-tasks-section'),
@@ -421,6 +422,9 @@ function displayResults(data) {
     elements.tasksTotal.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
     currentPage = 1;
 
+    // Display Top 3 Overall (by score)
+    displayTop3Overall(tasks.slice(0, 3));
+
     // Separate ready and blocked tasks
     const { ready, blocked } = separateReadyAndBlockedTasks(tasks);
 
@@ -456,6 +460,32 @@ function separateReadyAndBlockedTasks(tasks) {
     });
 
     return { ready, blocked };
+}
+
+function displayTop3Overall(topTasks) {
+    if (topTasks.length === 0) {
+        elements.top3List.innerHTML = '<p style="color: var(--text-secondary); padding: var(--space-m);">No tasks to display</p>';
+        return;
+    }
+
+    elements.top3List.innerHTML = topTasks.map((task, index) => {
+        const isBlocked = task.dependencies && task.dependencies.length > 0;
+        const blockBadge = isBlocked ? '<span class="blocked-indicator" title="Has dependencies">⚠</span>' : '';
+
+        return `
+            <div class="suggestion-item">
+                <div class="suggestion-rank">#${index + 1}</div>
+                <h3 class="suggestion-title">${escapeHtml(task.title)} ${blockBadge}</h3>
+                <div class="task-details">
+                    <span>Due: ${formatDate(task.due_date)}</span>
+                    <span>${task.estimated_hours}h</span>
+                    <span>Importance: ${task.importance}/10</span>
+                    <span>Score: ${task.score}</span>
+                </div>
+                <p class="suggestion-reason">${escapeHtml(task.explanation)}</p>
+            </div>
+        `;
+    }).join('');
 }
 
 function displayReadyTasks(readyTasks) {

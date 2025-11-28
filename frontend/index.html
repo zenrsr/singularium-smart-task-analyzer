@@ -197,7 +197,26 @@
 
             <!-- Results Content -->
             <div id="results-content" class="results-content" style="display: none;">
-                <!-- Top Suggestions - Ready to Work -->
+                <!-- Visualization Buttons (Prominent) -->
+                <div class="visualization-toolbar">
+                    <button id="show-matrix-btn" class="btn btn-ghost">
+                        Eisenhower Matrix
+                    </button>
+                    <button id="show-graph-btn" class="btn btn-ghost">
+                        Dependency Graph
+                    </button>
+                </div>
+
+                <!-- Top 3 Overall (By Score) -->
+                <div class="card suggestions-card">
+                    <h2 class="section-title">
+                        Top 3 Overall
+                        <span class="section-subtitle">Highest priority tasks by score</span>
+                    </h2>
+                    <div id="top3-list" class="suggestions-list"></div>
+                </div>
+
+                <!-- Ready to Work -->
                 <div class="card suggestions-card">
                     <h2 class="section-title">
                         Ready to Work
@@ -231,16 +250,6 @@
                         <span id="page-info" class="page-info">Page 1 of 1</span>
                         <button id="next-page-btn" class="pagination-btn" disabled>Next</button>
                     </div>
-                </div>
-
-                <!-- Bonus Visualizations -->
-                <div class="visualization-buttons">
-                    <button id="show-matrix-btn" class="btn btn-ghost">
-                        Eisenhower Matrix
-                    </button>
-                    <button id="show-graph-btn" class="btn btn-ghost">
-                        Dependency Graph
-                    </button>
                 </div>
             </div>
         </section>
