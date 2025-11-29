@@ -9,7 +9,7 @@ An intelligent task management system that automatically scores and prioritizes 
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -17,33 +17,33 @@ An intelligent task management system that automatically scores and prioritizes 
 - [API Documentation](#api-documentation)
 - [Algorithm Explanation](#algorithm-explanation)
 - [Design Decisions](#design-decisions)
-- [Time Breakdown](#time-breakdown)
 - [Testing](#testing)
-- [Bonus Features](#bonus-features)
-- [Future Improvements](#future-improvements)
+<!-- - [Time Breakdown](#time-breakdown) -->
+<!-- - [Bonus Features](#bonus-features)
+- [Future Improvements](#future-improvements) -->
 
 ---
 
-## ✨ Features
+## Features
 
 ### Core Features
-- ✅ **Intelligent Task Scoring** - Multi-factor algorithm considering urgency, importance, effort, and dependencies
-- ✅ **Multiple Sorting Strategies** - 4 different approaches to task prioritization
-- ✅ **REST API** - Two main endpoints (`/analyze/` and `/suggest/`) plus bonus validation endpoint
-- ✅ **Modern Frontend** - Premium dark-mode UI with glassmorphism effects
-- ✅ **Form & Bulk Input** - Add tasks individually or paste JSON for bulk upload
-- ✅ **Edge Case Handling** - Handles overdue tasks, missing data, and circular dependencies
+- **Intelligent Task Scoring** - Multi-factor algorithm considering urgency, importance, effort, and dependencies
+- **Multiple Sorting Strategies** - 4 different approaches to task prioritization
+- **REST API** - Two main endpoints (`/analyze/` and `/suggest/`) plus bonus validation endpoint
+- **Modern Frontend** - Premium dark-mode UI with glassmorphism effects
+- **Form & Bulk Input** - Add tasks individually or paste JSON for bulk upload
+- **Edge Case Handling** - Handles overdue tasks, missing data, and circular dependencies
 
-### Bonus Features Implemented
-- ✅ **Advanced Configuration** - User-adjustable weight sliders for custom scoring (OFF by default)
-- ✅ **Eisenhower Matrix View** - Visual 2D grid categorizing tasks by urgency vs importance
-- ✅ **Dependency Graph Visualization** - Interactive Canvas-based graph showing task relationships
-- ✅ **Circular Dependency Detection** - DFS algorithm to identify and warn about dependency cycles
-- ✅ **Comprehensive Testing** - 16 unit tests with 89% code coverage
+### Additional Features Implemented
+- **Advanced Configuration** - User-adjustable weight sliders for custom scoring (OFF by default)
+- **Eisenhower Matrix View** - Visual 2D grid categorizing tasks by urgency vs importance
+- **Dependency Graph Visualization** - Interactive Canvas-based graph showing task relationships
+- **Circular Dependency Detection** - DFS algorithm to identify and warn about dependency cycles
+- **Comprehensive Testing** - 16 unit tests with 89% code coverage
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Backend:**
 - Python 3.11+
@@ -54,18 +54,41 @@ An intelligent task management system that automatically scores and prioritizes 
 **Frontend:**
 - HTML5
 - CSS3 (Modern dark-mode design with CSS Grid/Flexbox)
-- Vanilla JavaScript (ES6+)
+- Vanilla JavaScript (Modular ES6 Architecture)
 
 **Database:**
 - SQLite (default Django setup)
 
 ---
 
-## 🚀 Setup Instructions
+## Project Structure
+
+### Frontend (Modular Architecture)
+The frontend has been refactored from a monolithic script into a clean, modular ES6 architecture:
+
+```
+frontend/
+├── index.html          # Main entry point
+├── styles.css          # Global styles
+└── js/
+    ├── main.js         # App initialization & event handling
+    ├── state.js        # Global state & constants
+    ├── api.js          # API communication layer
+    ├── ui.js           # DOM manipulation & rendering
+    ├── visualizations.js # Canvas graphs & Matrix
+    └── utils.js        # Helper functions
+```
+
+### Backend (Django)
+Standard Django project structure with a `tasks` app handling all logic.
+
+---
+
+## Setup Instructions
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/zenrsr/singularium-smart-task-analyzer.git
 cd singularium
 ```
 
@@ -80,15 +103,29 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Run Migrations
+### 4. Configure Environment
+Create a `.env` file in the root directory:
+```bash
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+### 5. Run Migrations
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 5. Start the Development Server
+### 6. Start the Server
+**Development:**
 ```bash
 python manage.py runserver
+```
+
+**Production (Local Test):**
+```bash
+gunicorn backend.wsgi
 ```
 
 The backend API will be available at `http://127.0.0.1:8000/api/tasks/`
@@ -109,7 +146,30 @@ Access the app at `http://localhost:8080` (or directly via file://)
 
 ---
 
-## 📡 API Documentation
+## Deployment
+
+This project is configured for easy deployment on platforms like **Render**, **Railway**, or **Heroku**.
+
+### Configuration Files Included:
+- `Procfile`: For process management (gunicorn)
+- `build.sh`: For build automation
+- `requirements.txt`: Production dependencies (gunicorn, whitenoise)
+
+### Steps to Deploy (Render Example):
+1. Push code to GitHub
+2. Create new **Web Service** on Render
+3. Connect repository
+4. Set **Build Command**: `./build.sh`
+5. Set **Start Command**: `gunicorn backend.wsgi`
+6. Add Environment Variables:
+   - `PYTHON_VERSION`: `3.11.0`
+   - `SECRET_KEY`: (Generate random string)
+   - `DEBUG`: `False`
+   - `ALLOWED_HOSTS`: `*`
+
+---
+
+## API Documentation
 
 ### POST `/api/tasks/analyze/`
 Analyzes and sorts tasks by priority score.
@@ -167,7 +227,7 @@ Returns top 3 tasks with detailed explanations.
     "rank": 1,
     "task": {...},
     "score": 95.5,
-    "reason": "🔴 Ranked #1 with HIGH priority..."
+    "reason": "Ranked #1 with HIGH priority..."
   }],
   "total_analyzed": 10,
   "strategy_used": "smart_balance"
@@ -200,7 +260,7 @@ Detects circular dependencies.
 
 ---
 
-## 🧠 Algorithm Explanation
+## Algorithm Explanation
 
 ### Smart Balance Scorer (Default)
 
@@ -266,7 +326,7 @@ Users can customize the weights via the Advanced Config panel. Weights must sum 
 
 ---
 
-## 🎯 Design Decisions
+## Design Decisions
 
 ### 1. Strategy Pattern for Scoring
 **Decision**: Implemented different scoring strategies as separate classes using the Strategy Pattern.
@@ -314,7 +374,7 @@ Users can customize the weights via the Advanced Config panel. Weights must sum 
 
 ---
 
-## ⏱️ Time Breakdown
+<!-- ## Time Breakdown
 
 | Phase | Task | Time |
 |-------|------|------|
@@ -331,9 +391,9 @@ Users can customize the weights via the Advanced Config panel. Weights must sum 
 **Core Requirements**: 3.5 hours  
 **Bonus Features & Polish**: 2.5 hours
 
----
+--- -->
 
-## 🧪 Testing
+## Testing
 
 ### Running Tests
 
@@ -353,10 +413,10 @@ pytest -v
 **Result**: 16 tests, all passing, 89% code coverage
 
 **Test Categories**:
-- ✅ Scoring algorithm tests (5 tests)
-- ✅ Circular dependency detection (3 tests)
-- ✅ API endpoints (4 tests)
-- ✅ Strategy pattern (4 tests)
+- Scoring algorithm tests (5 tests)
+- Circular dependency detection (3 tests)
+- API endpoints (4 tests)
+- Strategy pattern (4 tests)
 
 **Key Test Cases**:
 - Overdue tasks receive highest scores
@@ -370,85 +430,31 @@ pytest -v
 
 ---
 
-## 🎁 Bonus Features Implemented
+<!-- ## Additional Features Implemented
 
-### 1. Comprehensive Unit Tests ✅
+### 1. Comprehensive Unit Tests
 - 16 well-structured tests
 - 89% code coverage
 - Tests edge cases, API endpoints, and business logic
 
-### 2. Dependency Graph Visualization ✅
+### 2. Dependency Graph Visualization
 - Interactive Canvas-based graph
 - Shows task relationships visually
 - Detects and highlights circular dependencies
 - Automatic layout using circular positioning
 
-### 3. Eisenhower Matrix View ✅
+### 3. Eisenhower Matrix View
 - 2D grid categorizing tasks
 - Four quadrants: Do First, Schedule, Delegate, Eliminate
 - Based on Urgency (due within 3 days) vs Importance (≥7/10)
 - Helps users see task distribution at a glance
 
-### 4. Advanced Weight Configuration ✅
+### 4. Advanced Weight Configuration
 - Collapsible panel (hidden by default)
 - 4 sliders for custom weight adjustment
 - Real-time validation (must sum to 100%)
 - Reset to defaults button
 - Demonst rates thoughtful UX design
 
----
+--- -->
 
-## 🚧 Future Improvements
-
-Given more time, I would implement:
-
-1. **User Authentication** - Multi-user support with task ownership
-2. **Task Persistence** - Save tasks to database instead of just analyzing
-3. **Historical Data** - Track completion patterns to improve algorithm
-4. **Date Intelligence** - Consider weekends/holidays in urgency calculations
-5. **Bulk Operations** - Complete, delete, or update multiple tasks at once
-6. **Export Functionality** - Export analysis results as CSV/PDF
-7. **Mobile App** - Native iOS/Android apps with offline support
-8. **Machine Learning** - Learn from user behavior to personalize scoring
-9. **Team Features** - Shared tasks, assignments, and delegation
-10. **Integration** - Connect with calendars, project management tools, etc.
-
----
-
-## 📸 Screenshots
-
-### Main Interface
-- Modern dark-mode design with glassmorphism
-- Form input and JSON bulk upload
-- Strategy selector with descriptions
-- Advanced Config panel (collapsible)
-
-### Results View
-- Top 3 suggested tasks with detailed reasoning
-- All tasks sorted by priority
-- Color-coded priority badges (HIGH/MEDIUM/LOW)
-- Detailed explanations for each score
-
-### Bonus Visualizations
-- Eisenhower Matrix: 2x2 grid view
-- Dependency Graph: Interactive Canvas visualization
-
----
-
-## 👨‍💻 Author
-
-Built with ❤️ as a technical assessment for Singularium Software Development Intern position.
-
-**Key Achievements**:
-- ✅ 100% compliance with all core requirements
-- ✅ 3 major bonus features implemented
-- ✅ 16 passing unit tests with 89% coverage
-- ✅ Production-quality code with type hints and docstrings
-- ✅ Premium UI that stands out visually
-- ✅ Comprehensive documentation
-
----
-
-## 📄 License
-
-This project was created for educational and assessment purposes.
