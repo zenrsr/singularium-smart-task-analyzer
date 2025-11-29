@@ -459,7 +459,7 @@ function displaySuggestions(topTasks) {
                 const tooltipText = `This task cannot be started until the following ${blockingDeps.length === 1 ? 'task is' : 'tasks are'} completed: ${depNames}. Complete ${blockingDeps.length === 1 ? 'this dependency' : 'these dependencies'} first to unblock this task.`;
 
                 blockingBadge = `
-                    <div class="blocking-badge" data-tooltip="${escapeHtml(tooltipText)}">
+                    <div class="blocking-badge" data-tooltip='${tooltipText.replace(/'/g, "&apos;")}'>
                         <span class="blocking-badge-icon">⚠</span>
                         <span>Waiting on: ${depNames}</span>
                     </div>
@@ -516,7 +516,7 @@ function displayAllTasks(tasks) {
                 const tooltipText = `This task cannot be started until the following ${blockingDeps.length === 1 ? 'task is' : 'tasks are'} completed: ${depNames}. Complete ${blockingDeps.length === 1 ? 'this dependency' : 'these dependencies'} first to unblock this task.`;
 
                 blockingBadge = `
-                    <div class="blocking-badge" data-tooltip="${escapeHtml(tooltipText)}" style="margin-top: var(--space-xs);">
+                    <div class="blocking-badge" data-tooltip='${tooltipText.replace(/'/g, "&apos;")}' style="margin-top: var(--space-xs);">
                         <span class="blocking-badge-icon">⚠</span>
                         <span>Complete first: ${depNames}</span>
                     </div>
