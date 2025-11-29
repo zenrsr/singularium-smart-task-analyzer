@@ -15,8 +15,48 @@ Edge cases handled:
 """
 
 from abc import ABC, abstractmethod
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Tuple
+
+
+def count_business_days(start_date: date, end_date: date) -> int:
+    """
+    Count business days (Monday-Friday) between two dates.
+    
+    This provides more realistic urgency calculations by excluding weekends.
+    For example, a task due Monday evaluated on Friday is 1 business day away,
+    not 3 calendar days.
+    
+    Args:
+        start_date: Starting date (typically today)
+        end_date: Ending date (typically task due date)
+        
+    Returns:
+        Number of business days between dates (can be negative if end < start)
+        
+    Example:
+        Friday (2025-11-28) to Monday (2025-12-01) = 1 business day
+        Monday to Friday (same week) = 5 business days
+    """
+    if start_date == end_date:
+        return 0
+    
+    # Determine direction
+    if start_date > end_date:
+        # Counting backwards (overdue case)
+        return -count_business_days(end_date, start_date)
+    
+    business_days = 0
+    current = start_date
+    
+    while current < end_date:
+        # weekday() returns 0=Monday, 6=Sunday
+        # We count Monday-Friday (0-4)
+        if current.weekday() < 5:
+            business_days += 1
+        current += timedelta(days=1)
+    
+    return business_days
 
 
 class ScoringStrategy(ABC):
@@ -107,7 +147,12 @@ class SmartBalanceScorer(ScoringStrategy):
         return round(score, 2), explanation
     
     def _calculate_urgency(self, task_data: Dict) -> Tuple[float, str]:
-        """Calculate urgency score based on due date."""
+        """
+        Calculate urgency score based on due date.
+        
+        Uses business days (Mon-Fri) for more realistic urgency.
+        Weekend-aware: A task due Monday is 1 business day from Friday, not 3.
+        """
         try:
             due_date = task_data.get('due_date')
             
@@ -120,22 +165,24 @@ class SmartBalanceScorer(ScoringStrategy):
                 due_date = datetime.fromisoformat(due_date).date()
             
             today = date.today()
-            days_until_due = (due_date - today).days
+            
+            # Use business days instead of calendar days
+            days_until_due = count_business_days(today, due_date)
             
             if days_until_due < 0:
                 # OVERDUE - maximum urgency
                 days_overdue = abs(days_until_due)
-                return 100, f"⚠️ OVERDUE by {days_overdue} day(s)"
+                return 100, f"⚠️ OVERDUE by {days_overdue} business day(s)"
             elif days_until_due == 0:
                 return 90, "⚠️ Due TODAY"
             elif days_until_due == 1:
-                return 80, "Due tomorrow"
+                return 80, "Due tomorrow (1 business day)"
             elif days_until_due <= 3:
-                return 50, f"Due in {days_until_due} days"
-            elif days_until_due <= 7:
-                return 30, f"Due in {days_until_due} days"
-            elif days_until_due <= 14:
-                return 15, "Due in 2 weeks"
+                return 50, f"Due in {days_until_due} business days"
+            elif days_until_due <= 5:
+                return 30, f"Due in {days_until_due} business days"
+            elif days_until_due <= 10:
+                return 15, "Due within 2 weeks"
             else:
                 return 5, "Due date is distant"
                 
@@ -243,11 +290,15 @@ class DeadlineDrivenScorer(ScoringStrategy):
     
     def calculate_score(
         self, 
-        task_data: Dict, 
+        task_data: Dict,
         all_tasks: List[Dict] = None,
         weights: Optional[Dict[str, float]] = None
     ) -> Tuple[float, str]:
-        """Score based on due date urgency."""
+        """
+        Score based on due date urgency using business days.
+        
+        Weekend-aware for consistent urgency across all strategies.
+        """
         try:
             due_date = task_data.get('due_date')
             
@@ -258,19 +309,21 @@ class DeadlineDrivenScorer(ScoringStrategy):
                 due_date = datetime.fromisoformat(due_date).date()
             
             today = date.today()
-            days_until_due = (due_date - today).days
+            
+            # Use business days for deadline calculations
+            days_until_due = count_business_days(today, due_date)
             
             if days_until_due < 0:
                 score = 150 + abs(days_until_due)
-                return score, f"Overdue by {abs(days_until_due)} days"
+                return score, f"Overdue by {abs(days_until_due)} business days"
             elif days_until_due == 0:
                 return 120, "Due today"
-            elif days_until_due <= 7:
+            elif days_until_due <= 5:  # Within 1 week of business days
                 score = 100 - (days_until_due * 10)
-                return score, f"Due in {days_until_due} days"
+                return score, f"Due in {days_until_due} business days"
             else:
                 score = max(0, 30 - days_until_due)
-                return score, f"Due in {days_until_due} days"
+                return score, f"Due in {days_until_due} business days"
                 
         except Exception:
             return 0, "Invalid due date"

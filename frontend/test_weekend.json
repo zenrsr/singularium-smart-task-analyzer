@@ -1,0 +1,16 @@
+[
+    {
+        "title": "Task due next Monday",
+        "due_date": "2025-12-02",
+        "estimated_hours": 2,
+        "importance": 8,
+        "dependencies": []
+    },
+    {
+        "title": "Task due Sunday (3 days)",
+        "due_date": "2025-12-01",
+        "estimated_hours": 2,
+        "importance": 8,
+        "dependencies": []
+    }
+]

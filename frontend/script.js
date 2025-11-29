@@ -427,14 +427,14 @@ function displayResults(data) {
     elements.tasksTotal.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
     currentPage = 1;
 
-    // Display top 3 suggestions
-    displaySuggestions(tasks.slice(0, 3));
+    // Display top 3 suggestions (pass ALL tasks for dependency lookup)
+    displaySuggestions(tasks.slice(0, 3), tasks);
 
     // Display all tasks with pagination
     displayAllTasks(tasks);
 }
 
-function displaySuggestions(topTasks) {
+function displaySuggestions(topTasks, allTasks) {
     if (topTasks.length === 0) {
         elements.suggestionsList.innerHTML = '<p style="color: var(--text-muted);">No tasks to suggest</p>';
         return;
@@ -443,15 +443,21 @@ function displaySuggestions(topTasks) {
     const taskIds = new Set(currentTasks.map(t => t.id));
 
     elements.suggestionsList.innerHTML = topTasks.map((task, index) => {
-        // Check for blocking dependencies
+        // Check for blocking dependencies WITH SCORE CONTRADICTION
         let blockingBadge = '';
         if (task.dependencies && task.dependencies.length > 0) {
-            const blockingDeps = task.dependencies.filter(depId => taskIds.has(depId));
+            // Only show warning if dependencies have LOWER scores (contradiction)
+            // Look up in allTasks (scored results) not currentTasks!
+            const blockingDeps = task.dependencies.filter(depId => {
+                const depTask = allTasks.find(t => t.id === depId);
+                // Show badge only if: dependency exists AND has lower score
+                return depTask && depTask.score < task.score;
+            });
 
             if (blockingDeps.length > 0) {
                 const depNames = blockingDeps
                     .map(depId => {
-                        const depTask = currentTasks.find(t => t.id === depId);
+                        const depTask = allTasks.find(t => t.id === depId);
                         return depTask ? `#${depId}: ${depTask.title}` : `Task #${depId}`;
                     })
                     .join(', ');
@@ -495,9 +501,13 @@ function displaySuggestions(topTasks) {
         const importanceLevel = task.importance >= 7 ? 'High' : task.importance >= 4 ? 'Medium' : 'Low';
         detailsList.push(`${importanceLevel} importance (${task.importance}/10)`);
 
-        // Blocking info
+        // Blocking info (only if contradictory - dependency has lower score)
         if (task.dependencies && task.dependencies.length > 0) {
-            const blockingDeps = task.dependencies.filter(depId => taskIds.has(depId));
+            const blockingDeps = task.dependencies.filter(depId => {
+                const depTask = allTasks.find(t => t.id === depId);
+                return depTask && depTask.score < task.score; // Only contradictions
+            });
+
             if (blockingDeps.length > 0) {
                 detailsList.push(`Blocked by ${blockingDeps.length} task${blockingDeps.length !== 1 ? 's' : ''}`);
             }
@@ -538,15 +548,21 @@ function displayAllTasks(tasks) {
     elements.allTasksList.innerHTML = paginatedTasks.map(task => {
         const priorityClass = task.priority_level.toLowerCase();
 
-        // Check for blocking dependencies
+        // Check for blocking dependencies WITH SCORE CONTRADICTION
         let blockingBadge = '';
         if (task.dependencies && task.dependencies.length > 0) {
-            const blockingDeps = task.dependencies.filter(depId => taskIds.has(depId));
+            // Only show warning if dependencies have LOWER scores (contradiction)
+            // Use tasks array (scored) not currentTasks (unscored)
+            const blockingDeps = task.dependencies.filter(depId => {
+                const depTask = tasks.find(t => t.id === depId);
+                // Show badge only if: dependency exists AND has lower score
+                return depTask && depTask.score < task.score;
+            });
 
             if (blockingDeps.length > 0) {
                 const depNames = blockingDeps
                     .map(depId => {
-                        const depTask = currentTasks.find(t => t.id === depId);
+                        const depTask = tasks.find(t => t.id === depId);
                         return depTask ? `#${depId}: ${depTask.title}` : `Task #${depId}`;
                     })
                     .join(', ');
