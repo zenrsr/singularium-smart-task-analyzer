@@ -278,7 +278,7 @@ function loadJSONTasks() {
 
         updateTaskPreview();
         showSuccess(`Loaded ${currentTasks.length} tasks from JSON`);
-        switchTab('form');
+
 
     } catch (error) {
         showError(`Invalid JSON: ${error.message}`);
@@ -470,18 +470,53 @@ function displaySuggestions(topTasks) {
             }
         }
 
+        // Create clean detail list
+        const detailsList = [];
+
+        // Due date with urgency indicator
+        const dueDate = new Date(task.due_date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const isToday = dueDate.toDateString() === today.toDateString();
+        const isTomorrow = dueDate.toDateString() === new Date(today.getTime() + 86400000).toDateString();
+
+        if (isToday) {
+            detailsList.push('Due today');
+        } else if (isTomorrow) {
+            detailsList.push('Due tomorrow');
+        } else {
+            detailsList.push(`Due ${formatDate(task.due_date)}`);
+        }
+
+        // Effort
+        detailsList.push(`${task.estimated_hours} hour${task.estimated_hours !== 1 ? 's' : ''} estimated`);
+
+        // Importance level
+        const importanceLevel = task.importance >= 7 ? 'High' : task.importance >= 4 ? 'Medium' : 'Low';
+        detailsList.push(`${importanceLevel} importance (${task.importance}/10)`);
+
+        // Blocking info
+        if (task.dependencies && task.dependencies.length > 0) {
+            const blockingDeps = task.dependencies.filter(depId => taskIds.has(depId));
+            if (blockingDeps.length > 0) {
+                detailsList.push(`Blocked by ${blockingDeps.length} task${blockingDeps.length !== 1 ? 's' : ''}`);
+            }
+        }
+
         return `
             <div class="suggestion-item">
-                <div class="suggestion-rank">#${index + 1}</div>
-                <h3 class="suggestion-title">${escapeHtml(task.title)}</h3>
-                <div class="task-details">
-                    <span>Due: ${formatDate(task.due_date)}</span>
-                    <span>${task.estimated_hours}h</span>
-                    <span>Importance: ${task.importance}/10</span>
-                    <span>Score: ${task.score}</span>
+                <div class="suggestion-content">
+                    <h3 class="suggestion-title">${escapeHtml(task.title)}</h3>
+                    <ul class="task-details-list">
+                        ${detailsList.map(detail => `<li>${detail}</li>`).join('')}
+                    </ul>
+                    ${blockingBadge}
                 </div>
-                ${blockingBadge}
-                <p class="suggestion-reason">${escapeHtml(task.explanation)}</p>
+                
+                <div class="suggestion-score">
+                    <div class="suggestion-rank">#${index + 1}</div>
+                    <div class="suggestion-rank-label">Rank</div>
+                </div>
             </div>
         `;
     }).join('');

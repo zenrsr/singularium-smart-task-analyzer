@@ -205,9 +205,15 @@ body {
 
 textarea {
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    min-height: 200px;
+    font-size: var(--font-sm);
+    line-height: 1.5;
     resize: vertical;
 }
+
+#json-input {
+    min-height: 400px;
+}
+
 
 .help-text {
     font-size: var(--font-xs);
@@ -579,48 +585,93 @@ header p {
 }
 
 
+
 .suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-l);
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: var(--space-m);
     margin-bottom: var(--space-m);
-    position: relative;
+    transition: all 0.2s;
+}
+
+.suggestion-item:hover {
+    border-color: var(--accent);
+    background: var(--bg-panel);
+}
+
+.suggestion-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.suggestion-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
 }
 
 .suggestion-rank {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: var(--border);
-    color: var(--text-secondary);
-    font-size: var(--font-xs);
+    font-size: 2.5rem;
     font-weight: 700;
-    padding: 4px 10px;
-    border-bottom-left-radius: var(--radius);
+    line-height: 1;
 }
 
 .suggestion-item:nth-child(1) .suggestion-rank {
-    background: var(--high);
-    color: white;
+    color: var(--high);
 }
 
 .suggestion-item:nth-child(2) .suggestion-rank {
-    background: var(--medium);
-    color: #000;
+    color: var(--medium);
 }
 
 .suggestion-item:nth-child(3) .suggestion-rank {
-    background: var(--low);
-    color: white;
+    color: var(--low);
+}
+
+.suggestion-rank-label {
+    font-size: var(--font-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .suggestion-title {
     font-size: var(--font-lg);
     font-weight: 600;
-    margin-bottom: var(--space-xs);
-    padding-right: 40px;
+    margin: 0 0 var(--space-s) 0;
+    color: var(--text-main);
 }
+
+.task-details-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-s) 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.task-details-list li {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    padding-left: 16px;
+    position: relative;
+}
+
+.task-details-list li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: var(--accent);
+    font-weight: 700;
+}
+
 
 .task-details {
     display: flex;
@@ -635,7 +686,11 @@ header p {
     font-size: var(--font-sm);
     color: var(--text-secondary);
     line-height: 1.6;
+    margin: var(--space-s) 0 0 0;
+    padding-top: var(--space-s);
+    border-top: 1px solid var(--border);
 }
+
 
 /* ==================== ALL TASKS (TABLE STYLE) ==================== */
 .tasks-header {
