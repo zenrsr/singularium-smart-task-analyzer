@@ -489,33 +489,55 @@ function displayAllTasks(tasks) {
         return;
     }
 
+    const startIndex = (currentPage - 1) * TASKS_PER_PAGE;
+    const endIndex = startIndex + TASKS_PER_PAGE;
+    const paginatedTasks = tasks.slice(startIndex, endIndex);
     const totalPages = Math.ceil(tasks.length / TASKS_PER_PAGE);
-    const start = (currentPage - 1) * TASKS_PER_PAGE;
-    const end = start + TASKS_PER_PAGE;
-    const pageTasks = tasks.slice(start, end);
+    const taskIds = new Set(currentTasks.map(t => t.id));
 
-    elements.allTasksList.innerHTML = pageTasks.map((task) => {
+    elements.allTasksList.innerHTML = paginatedTasks.map(task => {
         const priorityClass = task.priority_level.toLowerCase();
+
+        // Check for blocking dependencies
+        let blockingBadge = '';
+        if (task.dependencies && task.dependencies.length > 0) {
+            const blockingDeps = task.dependencies.filter(depId => taskIds.has(depId));
+
+            if (blockingDeps.length > 0) {
+                const depNames = blockingDeps
+                    .map(depId => {
+                        const depTask = currentTasks.find(t => t.id === depId);
+                        return depTask ? `#${depId}: ${depTask.title}` : `Task #${depId}`;
+                    })
+                    .join(', ');
+
+                blockingBadge = `
+                    <div class="blocking-badge" style="margin-top: var(--space-xs);">
+                        <span class="blocking-badge-icon">⚠</span>
+                        <span>Complete first: ${depNames}</span>
+                    </div>
+                `;
+            }
+        }
 
         return `
             <div class="task-card">
-                <div class="task-info">
-                    <div class="task-title-row">
-                        <h3 class="task-title">${escapeHtml(task.title)}</h3>
-                        <span class="priority-badge ${priorityClass}">${task.priority_level}</span>
-                    </div>
-                    <div class="task-meta">
-                        <span>Due: ${formatDate(task.due_date)}</span>
-                        <span>${task.estimated_hours}h</span>
-                        <span>Importance: ${task.importance}/10</span>
-                        ${task.dependencies && task.dependencies.length > 0
-                ? `<span>Blocks: ${task.dependencies.length}</span>`
-                : ''}
-                    </div>
+                <div class="task-title-row">
+                    <h3 class="task-title">${escapeHtml(task.title)}</h3>
+                    <span class="priority-badge ${priorityClass}">${task.priority_level}</span>
                 </div>
-                <div class="task-score-display">
-                    <div class="score-value">${task.score}</div>
-                    <div class="score-label">Score</div>
+                
+                <div class="task-meta">
+                    <span>Due: ${formatDate(task.due_date)}</span>
+                    <span>${task.estimated_hours}h</span>
+                    <span>Importance: ${task.importance}/10</span>
+                </div>
+                
+                ${blockingBadge}
+                
+                <div class="task-score-row">
+                    <span class="score-label">Priority Score</span>
+                    <span class="score-value">${task.score}</span>
                 </div>
             </div>
         `;
