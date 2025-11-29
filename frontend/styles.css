@@ -5,11 +5,12 @@
 
 /* ==================== CSS VARIABLES ==================== */
 :root {
-    /* Palette */
-    --bg-app: #0b0d12;
-    --bg-panel: #14171f;
-    --bg-elevated: #1a1d28;
-    --bg-input: #0f1117;
+    /* Palette - Softened Dark Theme */
+    --bg-app: #181a20;
+    --bg-panel: #1f2229;
+    --bg-card: #1f2229;
+    --bg-elevated: #2a2d36;
+    --bg-input: #16181d;
 
     /* Borders */
     --border: #252932;

@@ -157,9 +157,9 @@ function setupEventListeners() {
 }
 
 function setDefaultDate() {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    elements.taskDate.value = tomorrow.toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    elements.taskDate.value = today;
+    elements.taskDate.min = today;
 }
 
 // ==================== TAB SWITCHING ====================
@@ -178,6 +178,15 @@ function updateImportanceValue() {
 
 function handleFormSubmit(e) {
     e.preventDefault();
+
+    const dueDate = new Date(elements.taskDate.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (dueDate < today) {
+        showToast('Due date cannot be in the past', 'error');
+        return;
+    }
 
     const task = {
         id: currentTasks.length + 1,
