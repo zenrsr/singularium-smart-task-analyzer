@@ -212,8 +212,7 @@ function setupEventListeners() {
     document.querySelectorAll('.toast-close').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const toast = e.target.closest('.toast');
-            toast.classList.remove('show');
-            setTimeout(() => toast.classList.add('hidden'), 300);
+            toast.style.display = 'none';
         });
     });
 

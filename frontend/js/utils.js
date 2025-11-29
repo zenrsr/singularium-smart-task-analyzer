@@ -22,14 +22,10 @@ export function escapeHtml(text) {
  */
 export function showErrorToast(message) {
     elements.errorMessage.textContent = message;
-    elements.errorToast.classList.remove('hidden');
-    elements.errorToast.classList.add('show');
+    elements.errorToast.style.display = 'flex';
 
     setTimeout(() => {
-        elements.errorToast.classList.remove('show');
-        setTimeout(() => {
-            elements.errorToast.classList.add('hidden');
-        }, 300);
+        elements.errorToast.style.display = 'none';
     }, 5000);
 }
 
@@ -39,14 +35,10 @@ export function showErrorToast(message) {
  */
 export function showSuccessToast(message) {
     elements.successMessage.textContent = message;
-    elements.successToast.classList.remove('hidden');
-    elements.successToast.classList.add('show');
+    elements.successToast.style.display = 'flex';
 
     setTimeout(() => {
-        elements.successToast.classList.remove('show');
-        setTimeout(() => {
-            elements.successToast.classList.add('hidden');
-        }, 300);
+        elements.successToast.style.display = 'none';
     }, 3000);
 }
 

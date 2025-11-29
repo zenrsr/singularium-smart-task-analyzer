@@ -1020,7 +1020,7 @@ header p {
     border-radius: var(--radius);
     font-size: var(--font-sm);
     font-weight: 500;
-    display: flex;
+    /* display is controlled by JavaScript */
     align-items: center;
     gap: 12px;
     z-index: 200;
