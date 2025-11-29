@@ -809,7 +809,7 @@ header p {
 
 /* ==================== PAGINATION ==================== */
 .pagination-controls {
-    display: flex;
+    /* display is controlled by JavaScript */
     justify-content: center;
     align-items: center;
     gap: var(--space-m);
@@ -864,7 +864,7 @@ header p {
     bottom: 0;
     background: rgba(0, 0, 0, 0.75);
     z-index: 100;
-    display: flex;
+    /* display is controlled by JavaScript */
     align-items: center;
     justify-content: center;
     padding: var(--space-l);

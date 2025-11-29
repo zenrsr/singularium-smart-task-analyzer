@@ -104,8 +104,8 @@ export function formatDate(dateString) {
  * Closes all modals
  */
 export function closeModals() {
-    elements.matrixModal.classList.add('hidden');
-    elements.graphModal.classList.add('hidden');
+    elements.matrixModal.style.display = 'none';
+    elements.graphModal.style.display = 'none';
 }
 
 /**
@@ -116,10 +116,10 @@ export function setLoading(isLoading) {
     if (isLoading) {
         elements.analyzeBtn.disabled = true;
         elements.analyzeBtnText.textContent = 'Analyzing...';
-        elements.analyzeLoader.classList.remove('hidden');
+        elements.analyzeLoader.style.display = 'inline-block';
     } else {
         elements.analyzeBtn.disabled = false;
         elements.analyzeBtnText.textContent = '🔍 Analyze Tasks';
-        elements.analyzeLoader.classList.add('hidden');
+        elements.analyzeLoader.style.display = 'none';
     }
 }
