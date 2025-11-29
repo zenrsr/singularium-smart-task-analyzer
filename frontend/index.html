@@ -14,7 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 
 <body>
@@ -290,7 +291,7 @@
     </div>
 
     <!-- JavaScript: Modular ES6 Modules -->
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
 </body>
 
 </html>
