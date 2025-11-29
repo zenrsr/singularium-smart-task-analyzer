@@ -532,22 +532,24 @@ function displayAllTasks(tasks) {
 
         return `
             <div class="task-card">
-                <div class="task-title-row">
-                    <h3 class="task-title">${escapeHtml(task.title)}</h3>
-                    <span class="priority-badge ${priorityClass}">${task.priority_level}</span>
+                <div class="task-card-content">
+                    <div class="task-title-row">
+                        <h3 class="task-title">${escapeHtml(task.title)}</h3>
+                        <span class="priority-badge ${priorityClass}">${task.priority_level}</span>
+                    </div>
+                    
+                    <div class="task-meta">
+                        <span>Due: ${formatDate(task.due_date)}</span>
+                        <span>${task.estimated_hours}h</span>
+                        <span>Importance: ${task.importance}/10</span>
+                    </div>
+                    
+                    ${blockingBadge}
                 </div>
                 
-                <div class="task-meta">
-                    <span>Due: ${formatDate(task.due_date)}</span>
-                    <span>${task.estimated_hours}h</span>
-                    <span>Importance: ${task.importance}/10</span>
-                </div>
-                
-                ${blockingBadge}
-                
-                <div class="task-score-row">
-                    <span class="score-label">Priority Score</span>
-                    <span class="score-value">${task.score}</span>
+                <div class="task-card-score">
+                    <div class="score-value">${task.score}</div>
+                    <div class="score-label">Score</div>
                 </div>
             </div>
         `;

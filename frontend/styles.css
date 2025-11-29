@@ -583,38 +583,43 @@ header p {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: var(--space-l);
+    padding: var(--space-m);
     margin-bottom: var(--space-m);
     position: relative;
-    transition: border-color 0.2s;
-}
-
-.suggestion-item:hover {
-    border-color: var(--accent);
 }
 
 .suggestion-rank {
     position: absolute;
-    top: var(--space-m);
-    right: var(--space-m);
-    background: var(--accent);
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 0;
+    right: 0;
+    background: var(--border);
+    color: var(--text-secondary);
+    font-size: var(--font-xs);
     font-weight: 700;
-    font-size: var(--font-sm);
+    padding: 4px 10px;
+    border-bottom-left-radius: var(--radius);
+}
+
+.suggestion-item:nth-child(1) .suggestion-rank {
+    background: var(--high);
+    color: white;
+}
+
+.suggestion-item:nth-child(2) .suggestion-rank {
+    background: var(--medium);
+    color: #000;
+}
+
+.suggestion-item:nth-child(3) .suggestion-rank {
+    background: var(--low);
+    color: white;
 }
 
 .suggestion-title {
     font-size: var(--font-lg);
     font-weight: 600;
-    margin-bottom: var(--space-s);
-    padding-right: 50px;
-    line-height: 1.3;
+    margin-bottom: var(--space-xs);
+    padding-right: 40px;
 }
 
 .task-details {
@@ -649,30 +654,50 @@ header p {
     overflow: hidden;
 }
 
+/* All Tasks - Card Layout */
 .task-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-l);
     background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: var(--space-m);
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: var(--space-m);
-    align-items: center;
-    transition: background 0.15s;
+    margin-bottom: var(--space-s);
+    transition: all 0.2s;
 }
 
 .task-card:hover {
+    border-color: var(--accent);
     background: var(--bg-panel);
+}
+
+.task-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-card-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
 }
 
 .task-title-row {
     display: flex;
     align-items: center;
     gap: var(--space-s);
-    margin-bottom: 6px;
+    margin-bottom: var(--space-xs);
 }
 
 .task-title {
-    font-weight: 600;
     font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+    flex: 1;
 }
 
 .priority-badge {
@@ -700,15 +725,17 @@ header p {
 }
 
 .task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
     font-size: var(--font-sm);
     color: var(--text-tertiary);
-    display: flex;
-    gap: var(--space-m);
-    flex-wrap: wrap;
+    margin-bottom: var(--space-xs);
 }
 
-.task-score-display {
-    text-align: right;
+.task-meta span {
+    display: inline-flex;
+    align-items: center;
 }
 
 .score-value {
