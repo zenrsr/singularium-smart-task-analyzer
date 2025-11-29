@@ -555,11 +555,70 @@ header p {
     border-radius: 12px;
     border: 1px solid rgba(245, 158, 11, 0.3);
     margin-top: var(--space-xs);
+    cursor: help;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.blocking-badge:hover {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.5);
 }
 
 .blocking-badge-icon {
     font-size: 14px;
 }
+
+/* Tooltip */
+.blocking-badge[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    background: var(--bg-elevated);
+    color: var(--text-main);
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius);
+    font-size: var(--font-sm);
+    white-space: normal;
+    width: 320px;
+    max-width: 90vw;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    pointer-events: none;
+    text-align: left;
+}
+
+/* Tooltip arrow */
+.blocking-badge[data-tooltip]::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--bg-elevated);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 1001;
+}
+
+.blocking-badge[data-tooltip]:hover::before,
+.blocking-badge[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
 
 
 .suggestion-item {
