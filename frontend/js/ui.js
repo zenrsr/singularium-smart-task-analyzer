@@ -12,15 +12,12 @@ import { escapeHtml, formatDate, getPriorityClass, showSuccessToast, showErrorTo
  */
 export function switchTab(tabName) {
     elements.tabButtons.forEach(btn => btn.classList.remove('active'));
+
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
     document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
-    if (tabName === 'form') {
-        elements.formTab.classList.remove('hidden');
-        elements.jsonTab.classList.add('hidden');
-    } else {
-        elements.formTab.classList.add('hidden');
-        elements.jsonTab.classList.remove('hidden');
-    }
+    document.getElementById(`${tabName}-tab`).classList.add('active');
 }
 
 /**
